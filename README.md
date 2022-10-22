@@ -5,6 +5,8 @@ In This game u can with ur finger move sanke and ate donate
 - need ur finger
 - need ur hand
 
+
+
 `
 game = SnakeGameClass("food.png")
 
@@ -28,3 +30,5 @@ while True:
 
 
 `
+> 2323
+~~ 2222222 2323 23 23123124 ~~
