@@ -5,6 +5,7 @@ import cvzone
 import numpy as np
 import cv2 as cv
 from  cvzone.HandTrackingModule import HandDetector
+
 # webCam
 cap = cv.VideoCapture(1)
 cap.set(3, 1280)
