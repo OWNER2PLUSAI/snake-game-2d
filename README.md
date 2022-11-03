@@ -7,28 +7,3 @@ In This game u can with ur finger move sanke and ate donate
 
 
 
-`
-game = SnakeGameClass("food.png")
-
-
-while True:
-
-    success ,img = cap.read()
-
-    hands ,img = detector.findHands(img ,flipType=False)
-
-
-    if hands :
-        lmList = hands[0]['lmList']
-        pointIndex = lmList[8][0:2]
-        img = game.update(img , pointIndex)
-    
-
-    cv.imshow("Image" ,img)
-    if cv.waitKey(5) & 0xFF == ord("q"):
-        break
-
-
-`
-> 2323
-~~ 2222222 2323 23 23123124 ~~

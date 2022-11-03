@@ -29,7 +29,7 @@ class SnakeGameClass :
         self.foodPoint = 0 ,0
         self.randomFoodLoction()
         self.score = 0
-
+        self.gameOver = True
 
 
     def randomFoodLoction(self):
@@ -38,57 +38,94 @@ class SnakeGameClass :
 
 
     def update(self ,imgMain ,currentHead):
-        px ,py = self.previousHead
-        cx ,cy = currentHead
+        
+        if self.gameOver :
+            cvzone.putTextRect(imgMain ,"Game Over" , [300,400],
+            scale=7 ,thickness=5 ,offset=20)
 
-        self.points.append([cx ,cy])
-        distance = math.hypot(cx - px,cy - py)
-        self.lengths.append(distance)
-        self.currentLenght += distance
-        self.previousHead = cx , cy
-
-        # Lenght Reduction
-
-        if self.currentLenght > self.allowedLenght:
-            for i,lenght in enumerate(self.lengths):
-                self.currentLenght -= lenght
-                self.lengths.pop(i)
-                self.points.pop(i)
-                if self.currentLenght < self.allowedLenght:
-                    break
+            cvzone.putTextRect(imgMain ,f"Your Score : {self.score}" , [300,500],
+            scale=7 ,thickness=5 ,offset=20)
 
 
-        # Check if snake ate the food
-        rx ,ry = self.foodPoint
-
-        if rx - self.wFood // 2 <cx< rx + self.wFood // 2 and \
-             ry - self.hFood // 2 <cx< ry + self.hFood // 2:
-
-            self.randomFoodLoction()
-            self.allowedLenght += 50
-            self.score += 1
-            print(self.score)
+        else:
 
 
 
+            px ,py = self.previousHead
+            cx ,cy = currentHead
 
-        # drow snake
-        if self.points:
+            self.points.append([cx ,cy])
+            distance = math.hypot(cx - px,cy - py)
+            self.lengths.append(distance)
+            self.currentLenght += distance
+            self.previousHead = cx , cy
 
-            for i,point in enumerate(self.points):
+            # Lenght Reduction
 
-                if i != 0:
-                    cv.line(imgMain,self.points[i -1] ,self.points[i] ,(0,0,255) ,20)
+            if self.currentLenght > self.allowedLenght:
+                for i,lenght in enumerate(self.lengths):
+                    self.currentLenght -= lenght
+                    self.lengths.pop(i)
+                    self.points.pop(i)
+                    if self.currentLenght < self.allowedLenght:
+                        break
 
-            cv.circle(img ,self.points[-1] ,20 ,(200,0,200) ,cv.FILLED )
+
+            # Check if snake ate the food
+            rx ,ry = self.foodPoint
+
+            if rx - self.wFood // 2 <cx< rx + self.wFood // 2 and \
+                ry - self.hFood // 2 <cx< ry + self.hFood // 2:
+
+                self.randomFoodLoction()
+                self.allowedLenght += 50
+                self.score += 1
+                print(self.score)
+            
+
         
 
-        # Drow Food 
-        rx , ry = self.foodPoint
-        imgMain = cvzone.overlayPNG(imgMain ,self.imgfood ,(rx - self.hFood // 2 ,ry - self.wFood // 2))
+            # drow snake
+            if self.points:
 
+                for i,point in enumerate(self.points):
+
+                    if i != 0:
+                        cv.line(imgMain,self.points[i -1] ,self.points[i] ,(0,0,255) ,20)
+
+                cv.circle(img ,self.points[-1] ,20 ,(200,0,200) ,cv.FILLED )
+            
+
+            # Drow Food 
+            rx , ry = self.foodPoint
+            imgMain = cvzone.overlayPNG(imgMain ,self.imgfood ,(rx - self.hFood // 2 ,ry - self.wFood // 2))
+
+            
+            #check for collision
+            pts = np.array(self.points[:-2], np.int32)
+            pts = pts.reshape((-1,1,2))
+            cv.polylines(imgMain,[pts] ,False ,(0,255,0) ,3)
+            minDist = cv.pointPolygonTest(pts ,(cx,cy) ,True )
+
+            if -1 <= minDist <=1 :
+                print("hit") 
+                self.gameOver = True
+                self.points = [] # all points of snake
+                self.lengths = [] # distance between each point
+                self.currentLenght = 0 # total lenght of snake
+                self.allowedLenght = 150 # total allowed Lenght
+                self.previousHead = 0 ,0 # pervious head point
+                self.randomFoodLoction()
+                self.score = 0
+        
+            # Score
+            cvzone.putTextRect(imgMain ,f"Score : {self.score}" , [50,80],
+                scale=3 ,thickness=3 ,offset=20)
 
         return imgMain
+
+
+
 
 
 game = SnakeGameClass("food.png")
@@ -108,8 +145,8 @@ while True:
     
 
     cv.imshow("Image" ,img)
-    if cv.waitKey(5) & 0xFF == ord("q"):
-        break
+    if cv.waitKey(5) & 0xFF == ord("r"):
+        game.gameOver = False
 
 
 
